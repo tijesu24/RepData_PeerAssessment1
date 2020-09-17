@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-##Load libraries
+##Load libraries  
 ```{r echo=FALSE}
 library(dplyr)
 library(imputeTS)
@@ -18,7 +18,7 @@ library(ggplot2)
 ```
 
 
-## Loading and preprocessing the data
+## Loading and preprocessing the data  
 ```{r}
 activity <- read.csv("activity.csv")
 
@@ -42,7 +42,7 @@ activity$date <- with(activity,
 
 
 
-## What is mean total number of steps taken per day?
+## What is mean total number of steps taken per day?  
 
 ```{r}
 meanPerDay = activity %>% group_by(date) %>% 
@@ -52,21 +52,22 @@ hist(meanPerDay$mean.steps,
      main = "Histogram of Mean Steps per day",
      xlab = "Mean Steps per day")
 ```
-This is a table of median and mean per day
+  
+This is a table of median and mean per day  
 
 ```{r}
 kbl(meanPerDay) %>% 
     kable_styling()
 ```
 
-## What is the average daily activity pattern?
+## What is the average daily activity pattern?  
 ```{r}
 plot(meanPerDay$date, meanPerDay$mean.steps,  type = "l")
 ```
 
 
 
-## Imputing missing values
+## Imputing missing values  
 ```{r}
 dfInputMissing <- activity
 
@@ -90,7 +91,7 @@ replacedMeanPerDay <-  dfInputMissing %>% group_by(date) %>%
 
 ```
 
-This is the Histogram of the data with missing values replaced
+This is the Histogram of the data with missing values replaced  
 ```{r}
 
 hist(replacedMeanPerDay$mean.steps,
@@ -99,7 +100,7 @@ hist(replacedMeanPerDay$mean.steps,
 ```
 
 
-This shows the mean and median of the data with the missing values replaced
+This shows the mean and median of the data with the missing values replaced  
 ```{r}
 
 kbl(replacedMeanPerDay) %>% 
@@ -107,7 +108,7 @@ kbl(replacedMeanPerDay) %>%
 ```
 
 
-## Are there differences in activity patterns between weekdays and weekends?
+## Are there differences in activity patterns between weekdays and weekends?  
 ```{r}
 isDateWeekend <- 
     weekdays(dfInputMissing$dateTime) %in% c("Saturday","Sunday")
