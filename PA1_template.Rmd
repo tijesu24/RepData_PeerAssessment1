@@ -2,15 +2,17 @@
 title: "Reproducible Research: Peer Assessment 1"
 author: "Tijesunimi Adebiyi"
 date: "9/15/2020"
-output: html_document
+output: 
+  html_document:
+    keep_md: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-##Load libraries  
-```{r echo=FALSE}
+## Load libraries  
+```{r ,message = FALSE, warning = FALSE}
 library(dplyr)
 library(imputeTS)
 library(kableExtra)
