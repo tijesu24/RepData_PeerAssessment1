@@ -4,7 +4,8 @@ author: "Tijesunimi Adebiyi"
 date: "9/15/2020"
 output: 
   html_document:
-    keep_md: true---
+    keep_md: true
+---
 
 
 ```{r setup, include=FALSE}
@@ -32,9 +33,7 @@ activity$time <-  sapply(intervalCh, function(x){
     return(paste(paste(rep("0", 4-strlength),collapse =  ""),x, 
                      sep = ""))
     }, USE.NAMES = FALSE)
-activity$dateTime <- with(activity,
-                          strptime(paste(date,time),
-                                   format = "%F %H%M"))
+
 activity$date <- with(activity,
                           strptime(date,
                                    format = "%F"))
@@ -46,37 +45,50 @@ activity$date <- with(activity,
 
 ## What is mean total number of steps taken per day?  
 
-```{r}
-meanPerDay = activity %>% group_by(date) %>% 
+```{r, message= FALSE}
+sumPerDay = activity %>% group_by(date) %>% 
     summarise(
-        sum.steps = sum(steps, na.rm = T)
-        ,mean.steps = mean(steps, na.rm = T),
-              median.steps = median(steps, na.rm = T))
-hist(meanPerDay$sum.steps,
+        sum.steps = sum(steps, na.rm = T))
+hist(sumPerDay$sum.steps,
      main = "Histogram of Sum of Steps per day",
      xlab = "Sum of Steps per day")
 ```
   
-This is a table of median and mean per day  
+Mean and Median of Total number of steps
 
 ```{r}
-kbl(meanPerDay) %>% 
-    kable_styling()
+list(
+  mean = mean(sumPerDay$sum.steps, na.rm = T),
+  median = median(sumPerDay$sum.steps, na.rm = T)
+)
 ```
 
 ## What is the average daily activity pattern?  
 ```{r}
-plot(meanPerDay$date, meanPerDay$mean.steps,  type = "l")
+averagePerInterval = activity %>% group_by(interval) %>% 
+    summarise(
+        mean.steps = mean(steps, na.rm = T))
+plot(averagePerInterval$interval,
+     averagePerInterval$mean.steps,  type = "l")
+```
+
+### To determine which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps
+```{r}
+#To determine the maximum interval
+paste("The interval with maximum number of steps is",
+  averagePerInterval$interval[averagePerInterval$mean.steps 
+                       == max(averagePerInterval$mean.steps)])
 ```
 
 
 
 ## Imputing missing values  
 ```{r}
-dfInputMissing <- activity
+print(paste("The number of missing values is", 
+            sum(is.na(activity$steps))))
 
-#Fill missing values in mean with moving averages
-inputtedMean <- na_ma(meanPerDay)
+
+dfInputMissing <- activity
 
 #Fill missing values in original dataframe
 #with mean of steps in the day
@@ -84,40 +96,47 @@ inputtedMean <- na_ma(meanPerDay)
 missingRows <- activity[is.na(activity$steps),]
 
 missingInputed <- missingRows
-missingInputed$steps <- inputtedMean$mean.steps[
-    match(missingInputed$date,meanPerDay$date)
+missingInputed$steps <- averagePerInterval$mean.steps[
+    match(missingInputed$interval,averagePerInterval$interval)
 ]
 dfInputMissing[is.na(dfInputMissing$steps),] <- missingInputed
 
-replacedMeanPerDay <-  dfInputMissing %>% group_by(date) %>% 
-    summarise(
-        sum.steps = sum(steps, na.rm = T),
-        mean.steps = mean(steps, na.rm = T),
-              median.steps = median(steps, na.rm = T))
 
 ```
+  
+  
+    
+This is the Histogram of the Total Number of Steps with missing values replaced   
+  
+  
+```{r, message=FALSE }
 
-This is the Histogram of the data with missing values replaced  
-```{r}
-
-hist(replacedMeanPerDay$sum.steps,
+sumPerDayNoNA = dfInputMissing %>% group_by(date) %>% 
+    summarise(
+        sum.steps = sum(steps, na.rm = T))
+hist(sumPerDayNoNA$sum.steps,
      main = "Histogram of Sum of Steps per day",
      xlab = "Sum of Steps per day")
 ```
 
-
+  
 This shows the mean and median of the data with the missing values replaced  
 ```{r}
-
-kbl(replacedMeanPerDay) %>% 
-    kable_styling()
+list(
+  mean = mean(sumPerDayNoNA$sum.steps, na.rm = T),
+  median = median(sumPerDayNoNA$sum.steps, na.rm = T)
+)
 ```
-
+  
+  
+Imputing the missing data caused the mean and median to increase  
+  
+  
 
 ## Are there differences in activity patterns between weekdays and weekends?  
 ```{r}
 isDateWeekend <- 
-    weekdays(dfInputMissing$dateTime) %in% c("Saturday","Sunday")
+    weekdays(dfInputMissing$date) %in% c("Saturday","Sunday")
 dfInputMissing$is.weekend <- 
     ifelse(isDateWeekend, "weekend","weekday")
 
