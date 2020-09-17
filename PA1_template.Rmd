@@ -4,8 +4,8 @@ author: "Tijesunimi Adebiyi"
 date: "9/15/2020"
 output: 
   html_document:
-    keep_md: true
----
+    keep_md: true---
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -48,11 +48,13 @@ activity$date <- with(activity,
 
 ```{r}
 meanPerDay = activity %>% group_by(date) %>% 
-    summarise(mean.steps = mean(steps, na.rm = T),
+    summarise(
+        sum.steps = sum(steps, na.rm = T)
+        ,mean.steps = mean(steps, na.rm = T),
               median.steps = median(steps, na.rm = T))
-hist(meanPerDay$mean.steps,
-     main = "Histogram of Mean Steps per day",
-     xlab = "Mean Steps per day")
+hist(meanPerDay$sum.steps,
+     main = "Histogram of Sum of Steps per day",
+     xlab = "Sum of Steps per day")
 ```
   
 This is a table of median and mean per day  
@@ -88,7 +90,9 @@ missingInputed$steps <- inputtedMean$mean.steps[
 dfInputMissing[is.na(dfInputMissing$steps),] <- missingInputed
 
 replacedMeanPerDay <-  dfInputMissing %>% group_by(date) %>% 
-    summarise(mean.steps = mean(steps, na.rm = T),
+    summarise(
+        sum.steps = sum(steps, na.rm = T),
+        mean.steps = mean(steps, na.rm = T),
               median.steps = median(steps, na.rm = T))
 
 ```
@@ -96,9 +100,9 @@ replacedMeanPerDay <-  dfInputMissing %>% group_by(date) %>%
 This is the Histogram of the data with missing values replaced  
 ```{r}
 
-hist(replacedMeanPerDay$mean.steps,
-     main = "Histogram of Mean Steps per day",
-     xlab = "Mean Steps per day")
+hist(replacedMeanPerDay$sum.steps,
+     main = "Histogram of Sum of Steps per day",
+     xlab = "Sum of Steps per day")
 ```
 
 
